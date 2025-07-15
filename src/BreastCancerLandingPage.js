@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Heart, Shield, Zap, Users, ArrowRight, Play, CheckCircle, Star } from 'lucide-react';
+import SweatBiomarkerDetection from './SweatBiomarkerDetection';
 
 export default function BreastCancerLandingPage() {
   const [isVisible, setIsVisible] = useState(false);
+  const [showSweatDetection, setShowSweatDetection] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
+  if (showSweatDetection) {
+    return <SweatBiomarkerDetection theme="pink" onBack={() => setShowSweatDetection(false)} />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 font-sans">
@@ -59,6 +65,12 @@ export default function BreastCancerLandingPage() {
                 <button className="bg-white/80 backdrop-blur-sm text-gray-700 px-8 py-4 rounded-full font-semibold hover:bg-white transition-all duration-300 flex items-center justify-center group border border-gray-200">
                   <Play className="mr-2 w-5 h-5 group-hover:scale-110 transition-transform" />
                   Watch Demo
+                </button>
+                <button
+                  className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-4 rounded-full font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center group"
+                  onClick={() => setShowSweatDetection(true)}
+                >
+                  Detecting by Sweat
                 </button>
               </div>
               <div className="flex items-center space-x-6 text-sm text-gray-500">

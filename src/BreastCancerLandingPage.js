@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Heart, Shield, Zap, Users, ArrowRight, Play, CheckCircle, Star } from 'lucide-react';
+import DoctorScene from './components/DoctorModel';
+import { speak } from './components/TextToSpeech';
 
 export default function BreastCancerLandingPage() {
   const [isVisible, setIsVisible] = useState(false);
@@ -186,6 +188,63 @@ export default function BreastCancerLandingPage() {
                 <p className="text-gray-600">{feature.description}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section id="how-it-works" className="py-20 bg-white/70 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            {/* Doctor Model (Left) */}
+            <div className="flex justify-center items-center">
+              <div className="w-full max-w-md h-[400px] bg-white/80 rounded-3xl shadow-xl flex items-center justify-center border border-pink-100">
+                <DoctorScene />
+              </div>
+            </div>
+            {/* Explanation (Right) */}
+            <div>
+              <h2 className="text-4xl lg:text-5xl font-bold text-pink-600 mb-6 font-lexend tracking-tight">How It Works</h2>
+              <button
+                className="mb-6 px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-full shadow hover:scale-105 transition"
+                onClick={() => speak(
+                  `How It Works. Step 1: Start Screening. Click on Start Screening and answer a few simple questions to begin your health checkup journey. Step 2: Upload or Capture Image. Upload your medical image or capture a new one using your phone or computer. Step 3: AI Analysis. Our advanced AI instantly analyzes your image and provides accurate results with easy-to-understand feedback. Step 4: Get Personalized Report. Download or view your personalized report and get recommendations for next steps.`
+                )}
+              >
+                🔊 Listen
+              </button>
+              <ol className="space-y-8">
+                <li className="flex items-start">
+                  <span className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center text-white text-2xl shadow-lg mr-4 animate-bounce">1</span>
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-1">Start Screening</h3>
+                    <p className="text-gray-600">Click on <b>Start Screening</b> and answer a few simple questions to begin your health checkup journey.</p>
+                  </div>
+                </li>
+                <li className="flex items-start">
+                  <span className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center text-white text-2xl shadow-lg mr-4 animate-bounce">2</span>
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-1">Upload or Capture Image</h3>
+                    <p className="text-gray-600">Upload your medical image or capture a new one using your phone or computer.</p>
+                  </div>
+                </li>
+                <li className="flex items-start">
+                  <span className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center text-white text-2xl shadow-lg mr-4 animate-bounce">3</span>
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-1">AI Analysis</h3>
+                    <p className="text-gray-600">Our advanced AI instantly analyzes your image and provides accurate results with easy-to-understand feedback.</p>
+                  </div>
+                </li>
+                <li className="flex items-start">
+                  <span className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center text-white text-2xl shadow-lg mr-4 animate-bounce">4</span>
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-1">Get Personalized Report</h3>
+                    <p className="text-gray-600">Download or view your personalized report and get recommendations for next steps.</p>
+                  </div>
+                </li>
+              </ol>
+              <div className="mt-8 text-gray-500 text-sm italic">* Available in multiple languages soon for everyone!</div>
+            </div>
           </div>
         </div>
       </section>

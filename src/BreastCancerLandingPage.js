@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Heart, Shield, Zap, Users, ArrowRight, Play, CheckCircle, Star, AlertTriangle, User, Users as UsersIcon } from 'lucide-react';
+import { Heart, Shield, Zap, Users, ArrowRight, Play, CheckCircle, Star, AlertTriangle, User, Users as UsersIcon, UserPlus, UserCircle, Pause, RotateCcw, ArrowRightCircle } from 'lucide-react';
 import BreastCancerScreening from './BreastCancerScreening';
 import DoctorScene from './components/DoctorModel';
 import { BreastModel } from './components/BreastModel';
@@ -54,32 +54,60 @@ function FamilyHealthDashboard({ open, onClose }) {
     setFamily(fam => fam.map((m, i) => i === selected ? { ...m, relation: val } : m));
   }
 
+  // Helper for relation icon
+  function getRelationIcon(relation, selected) {
+    const base = 'inline w-5 h-5';
+    switch (relation) {
+      case 'Grandmother':
+        return <UserPlus className={base + (selected ? ' text-pink-500' : ' text-pink-400')} />;
+      case 'Mother':
+        return <UserCircle className={base + (selected ? ' text-purple-500' : ' text-pink-400')} />;
+      case 'Sister':
+        return <UsersIcon className={base + (selected ? ' text-pink-500' : ' text-pink-400')} />;
+      case 'You':
+        return <User className={base + (selected ? ' text-purple-600' : ' text-purple-400')} />;
+      default:
+        return <UsersIcon className={base + (selected ? ' text-pink-500' : ' text-pink-400')} />;
+    }
+  }
+
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
-      <div className="backdrop-blur-2xl bg-white/80 border border-pink-100 rounded-3xl shadow-2xl p-0 w-full max-w-2xl flex flex-col items-center animate-fade-in relative" onClick={e => e.stopPropagation()}>
+      <div className="backdrop-blur-2xl bg-white/80 border border-pink-100 rounded-3xl shadow-2xl p-0 w-full max-w-2xl flex flex-col items-center animate-fade-in relative" onClick={e => e.stopPropagation()} style={{boxShadow: '0 8px 32px 0 rgba(255, 182, 193, 0.25)'}}>
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-pink-500 text-2xl font-bold">&times;</button>
         <div className="p-8 w-full flex flex-col items-center">
-          <h2 className="text-4xl font-extrabold text-pink-600 mb-6 font-lexend tracking-tight drop-shadow-lg text-center" style={{letterSpacing: '0.03em'}}>Family Health Dashboard</h2>
+          <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 mb-6 font-lexend tracking-tight drop-shadow-lg text-center" style={{letterSpacing: '0.03em'}}>Family Health Dashboard</h2>
           {/* Family Tree Visualizer */}
           <div className="w-full flex flex-col items-center mb-8">
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col items-center gap-3">
               {family.map((m, idx) => (
-                <div key={idx} className={`flex items-center gap-3 px-6 py-2 rounded-xl cursor-pointer transition-all ${selected === idx ? 'bg-pink-100/80 shadow-lg scale-105' : 'hover:bg-pink-50'}`} onClick={() => setSelected(idx)}>
-                  <span className="text-lg font-bold flex items-center gap-2">
-                    {m.relation === 'You' ? <User className="inline w-5 h-5 text-purple-500" /> : <UsersIcon className="inline w-5 h-5 text-pink-400" />} {m.relation}
+                <div
+                  key={idx}
+                  className={`flex items-center gap-3 px-6 py-2 rounded-xl cursor-pointer transition-all duration-200
+                    ${selected === idx
+                      ? 'bg-gradient-to-r from-pink-100/80 to-purple-100/80 shadow-xl scale-105 ring-2 ring-pink-400/60'
+                      : 'hover:bg-pink-50 hover:scale-105 hover:shadow-lg'}
+                  `}
+                  onClick={() => setSelected(idx)}
+                  style={{ minWidth: 220 }}
+                >
+                  <span className={`text-lg font-bold flex items-center gap-2 ${selected === idx ? 'text-pink-600' : 'text-gray-700'}`}
+                    style={{ letterSpacing: '0.01em' }}
+                  >
+                    {getRelationIcon(m.relation, selected === idx)}
+                    {m.relation}
                   </span>
-                  {m.cancer ? <AlertTriangle className="w-5 h-5 text-yellow-500" title="Diagnosed" /> : <CheckCircle className="w-5 h-5 text-green-500" title="Healthy" />}
                 </div>
               ))}
             </div>
             <div className="mt-2 text-xs text-gray-500">Click a family member to edit their info. (Add more coming soon!)</div>
           </div>
           {/* Minimal Data Entry */}
-          <div className="w-full flex flex-col gap-4 mb-8 max-w-md">
-            <div className="flex gap-2 items-center">
-              <span className="font-semibold">Relation:</span>
-              <select className="rounded px-2 py-1 border border-pink-200 bg-white/80" value={member.relation} onChange={e => updateRelation(e.target.value)}>
+          <div className="w-full flex flex-col gap-6 mb-8 max-w-md">
+            <div className="flex gap-3 items-center">
+              <span className="font-semibold text-gray-800">Relation:</span>
+              <select className="rounded-xl px-3 py-2 border border-pink-200 bg-white/60 backdrop-blur-md shadow-inner focus:outline-none focus:ring-2 focus:ring-pink-300 transition-all" value={member.relation} onChange={e => updateRelation(e.target.value)}>
                 <option>Mother</option>
                 <option>Sister</option>
                 <option>Grandmother</option>
@@ -87,22 +115,30 @@ function FamilyHealthDashboard({ open, onClose }) {
                 <option>Other</option>
               </select>
             </div>
-            <div className="flex gap-2 items-center">
-              <span className="font-semibold">Breast Cancer?</span>
-              <input type="checkbox" className="accent-pink-500" checked={member.cancer} onChange={e => updateField('cancer', e.target.checked)} />
+            <CustomCheckbox
+              label="Breast Cancer?"
+              checked={member.cancer}
+              onChange={e => updateField('cancer', e.target.checked)}
+            />
+            <div className="flex gap-3 items-center">
+              <span className="font-semibold text-gray-800">Age at Diagnosis:</span>
+              <input type="number" min="0" className="rounded-xl px-3 py-2 border border-pink-200 bg-white/60 backdrop-blur-md shadow-inner focus:outline-none focus:ring-2 focus:ring-pink-300 transition-all w-28" value={member.age} onChange={e => updateField('age', e.target.value)} />
             </div>
-            <div className="flex gap-2 items-center">
-              <span className="font-semibold">Age at Diagnosis:</span>
-              <input type="number" min="0" className="rounded px-2 py-1 border border-pink-200 bg-white/80 w-24" value={member.age} onChange={e => updateField('age', e.target.value)} />
-            </div>
-            <div className="flex gap-2 items-center">
-              <span className="font-semibold">Genetic Testing?</span>
-              <input type="checkbox" className="accent-pink-500" checked={member.genetic} onChange={e => updateField('genetic', e.target.checked)} />
-            </div>
-            <div className="flex gap-2 items-center flex-wrap">
-              <span className="font-semibold">Risk Factors:</span>
+            <CustomCheckbox
+              label="Genetic Testing?"
+              checked={member.genetic}
+              onChange={e => updateField('genetic', e.target.checked)}
+            />
+            <div className="flex gap-3 items-center flex-wrap">
+              <span className="font-semibold text-gray-800">Risk Factors:</span>
               {['Smoking', 'Drinking', 'Lifestyle'].map(factor => (
-                <label key={factor} className="ml-2"><input type="checkbox" className="accent-pink-500 mr-1" checked={member.risk.includes(factor)} onChange={() => updateRisk(factor)} />{factor}</label>
+                <CustomCheckbox
+                  key={factor}
+                  label={factor}
+                  checked={member.risk.includes(factor)}
+                  onChange={() => updateRisk(factor)}
+                  className="ml-2"
+                />
               ))}
             </div>
           </div>
@@ -121,12 +157,76 @@ function FamilyHealthDashboard({ open, onClose }) {
   );
 }
 
+function CustomCheckbox({ label, checked, onChange, className = '' }) {
+  return (
+    <label className={`flex items-center gap-2 cursor-pointer group ${className}`}>
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}
+        className="hidden"
+      />
+      <span className={`w-6 h-6 rounded-full border-2 border-pink-300 flex items-center justify-center transition-all duration-200
+        ${checked ? 'bg-gradient-to-br from-pink-400 to-purple-400 border-pink-500 shadow-md' : 'bg-white/60'}
+        group-hover:ring-2 group-hover:ring-pink-200
+      `}>
+        {checked && (
+          <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+            <path d="M5 13l4 4L19 7" />
+          </svg>
+        )}
+      </span>
+      <span className="select-none text-gray-700 group-hover:text-pink-600 transition-colors font-semibold">{label}</span>
+    </label>
+  );
+}
+
 export default function BreastCancerLandingPage() {
   const [isVisible, setIsVisible] = useState(false);
   const [showSweatDetection, setShowSweatDetection] = useState(false);
   const [showDoctorModel, setShowDoctorModel] = useState(false);
   const [authModal, setAuthModal] = useState(null); // 'login' | 'signup' | null
   const [showFamilyDashboard, setShowFamilyDashboard] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+
+  // Listen controls state
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const listenText = `How It Works. Step 1: Start Screening. Click on Start Screening and answer a few simple questions to begin your health checkup journey. Step 2: Upload or Capture Image. Upload your medical image or capture a new one using your phone or computer. Step 3: AI Analysis. Our advanced AI instantly analyzes your image and provides accurate results with easy-to-understand feedback. Step 4: Get Personalized Report. Download or view your personalized report and get recommendations for next steps.`;
+
+  // Listen controls handlers
+  const handlePlay = () => {
+    window.speechSynthesis.cancel(); // Stop any current speech
+    setIsSpeaking(true);
+    setIsPaused(false);
+    speak(listenText);
+  };
+  const handlePause = () => {
+    if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+      window.speechSynthesis.pause();
+      setIsPaused(true);
+    }
+  };
+  const handleResume = () => {
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+      setIsPaused(false);
+    }
+  };
+  // Listen for speech end to reset state
+  useEffect(() => {
+    const handleEnd = () => {
+      setIsSpeaking(false);
+      setIsPaused(false);
+    };
+    window.speechSynthesis.addEventListener('end', handleEnd);
+    window.speechSynthesis.addEventListener('pause', () => setIsPaused(true));
+    window.speechSynthesis.addEventListener('resume', () => setIsPaused(false));
+    return () => {
+      window.speechSynthesis.removeEventListener('end', handleEnd);
+    };
+  }, []);
 
   useEffect(() => {
     setIsVisible(true);
@@ -175,6 +275,49 @@ export default function BreastCancerLandingPage() {
     );
   };
 
+  // Handler for opening dashboard with terms check
+  const handleOpenDashboard = () => {
+    if (!agreedToTerms) {
+      setShowTermsModal(true);
+    } else {
+      setShowFamilyDashboard(true);
+    }
+  };
+
+  // Terms & Conditions Modal
+  const TermsModal = () => {
+    if (!showTermsModal) return null;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowTermsModal(false)}>
+        <div className="backdrop-blur-2xl bg-white/90 border border-pink-100 rounded-3xl shadow-2xl p-0 w-full max-w-lg flex flex-col items-center animate-fade-in relative" onClick={e => e.stopPropagation()} style={{boxShadow: '0 8px 32px 0 rgba(255, 182, 193, 0.25)'}}>
+          <button onClick={() => setShowTermsModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-pink-500 text-2xl font-bold">&times;</button>
+          <div className="p-8 w-full flex flex-col items-center">
+            <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 mb-4 font-lexend tracking-tight drop-shadow-lg text-center">Terms & Conditions</h2>
+            <div className="text-gray-700 text-base mb-6 text-center">
+              We collect only the information necessary for providing your personalized breast cancer risk assessment. <br />
+              <span className="font-semibold text-pink-600">Your privacy is extremely important to us.</span> <br />
+              This information will <span className="font-bold">never be shared</span> with any third party and is used solely for your health dashboard experience. <br />
+              You are always in control of your data.
+            </div>
+            <CustomCheckbox
+              label="I agree to the terms and conditions."
+              checked={agreedToTerms}
+              onChange={e => setAgreedToTerms(e.target.checked)}
+              className="mb-6"
+            />
+            <button
+              className={`w-full py-3 rounded-xl font-bold text-lg transition-all duration-200 ${agreedToTerms ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg hover:scale-105' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
+              disabled={!agreedToTerms}
+              onClick={() => { setShowTermsModal(false); setShowFamilyDashboard(true); }}
+            >
+              Proceed
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 font-sans">
       {/* Header */}
@@ -200,7 +343,7 @@ export default function BreastCancerLandingPage() {
               </button>
               <button
                 className="text-gray-700 hover:text-purple-600 transition-colors focus:outline-none font-semibold border border-purple-200 rounded-full px-4 py-1 ml-2 bg-white/70 hover:bg-purple-100"
-                onClick={() => setShowFamilyDashboard(true)}
+                onClick={handleOpenDashboard}
               >
                 Genetic Risk
               </button>
@@ -389,48 +532,90 @@ export default function BreastCancerLandingPage() {
       {/* How It Works Section */}
       <section id="how-it-works" className="py-20 bg-white/70 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* Doctor Model (Left) */}
-            <div className="flex justify-center items-center">
-              <div className="w-full max-w-md h-[400px] bg-white/80 rounded-3xl shadow-xl flex items-center justify-center border border-pink-100">
-                <DoctorScene />
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            {/* Doctor Card (Left) */}
+            <div className="flex flex-col items-center">
+              <div className="w-full max-w-lg h-[480px] bg-white/80 rounded-3xl shadow-2xl flex flex-col items-center justify-center border border-pink-100 backdrop-blur-2xl p-8">
+                <div className="flex-1 flex items-center justify-center" style={{minHeight: '320px'}}>
+                  <DoctorScene />
+                </div>
+                <div className="mt-6 text-center">
+                  <h3 className="text-2xl font-bold text-pink-600 mb-2">Meet Dr. CareDetect</h3>
+                  <p className="text-gray-600 text-base">Your friendly AI health assistant, here to guide you through every step of your breast cancer screening journey.</p>
+                </div>
               </div>
             </div>
-            {/* Explanation (Right) */}
-            <div>
-              <h2 className="text-4xl lg:text-5xl font-bold text-pink-600 mb-6 font-lexend tracking-tight">How It Works</h2>
-              <button
-                className="mb-6 px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-full shadow hover:scale-105 transition"
-                onClick={() => speak(
-                  `How It Works. Step 1: Start Screening. Click on Start Screening and answer a few simple questions to begin your health checkup journey. Step 2: Upload or Capture Image. Upload your medical image or capture a new one using your phone or computer. Step 3: AI Analysis. Our advanced AI instantly analyzes your image and provides accurate results with easy-to-understand feedback. Step 4: Get Personalized Report. Download or view your personalized report and get recommendations for next steps.`
+            {/* Steps (Right) */}
+            <div className="pl-0 md:pl-8">
+              <h2 className="text-4xl lg:text-5xl font-bold text-pink-600 mb-6 font-lexend tracking-tight">How CareDetect Works</h2>
+              {/* Listen Controls */}
+              <div className="mb-6 flex items-center gap-2 bg-white/70 backdrop-blur-lg rounded-full px-3 py-1 shadow-lg border border-pink-200/60 w-fit" style={{ boxShadow: '0 2px 12px 0 rgba(236, 72, 153, 0.10)' }}>
+                {/* Play or Replay */}
+                {!isSpeaking ? (
+                  <button
+                    className={`p-1 rounded-full transition flex items-center justify-center group ring-2 ring-pink-400/60`}
+                    onClick={handlePlay}
+                    aria-label="Play"
+                    title="Play"
+                  >
+                    <Play className="w-4 h-4 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500 group-hover:from-pink-600 group-hover:to-purple-600" />
+                  </button>
+                ) : (
+                  <button
+                    className={`p-1 rounded-full transition flex items-center justify-center group ring-2 ring-pink-400/60`}
+                    onClick={handlePlay}
+                    aria-label="Replay"
+                    title="Replay"
+                  >
+                    <RotateCcw className="w-4 h-4 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500 group-hover:from-pink-600 group-hover:to-purple-600" />
+                  </button>
                 )}
-              >
-                🔊 Listen
-              </button>
+                {/* Pause */}
+                <button
+                  className={`p-1 rounded-full transition flex items-center justify-center group ${isPaused ? 'ring-2 ring-pink-300/60' : ''}`}
+                  onClick={handlePause}
+                  aria-label="Pause"
+                  title="Pause"
+                  disabled={!isSpeaking || isPaused}
+                >
+                  <Pause className={`w-4 h-4 ${!isSpeaking || isPaused ? 'text-gray-300' : 'text-pink-400 group-hover:text-pink-600'}`} />
+                </button>
+                {/* Resume (ArrowRightCircle) */}
+                <button
+                  className={`p-1 rounded-full transition flex items-center justify-center group ${isSpeaking && isPaused ? 'ring-2 ring-green-300/60' : ''}`}
+                  onClick={handleResume}
+                  aria-label="Resume"
+                  title="Resume"
+                  disabled={!isSpeaking || !isPaused}
+                >
+                  <ArrowRightCircle className={`w-4 h-4 ${!isSpeaking || !isPaused ? 'text-gray-300' : 'text-green-400 group-hover:text-green-600'}`} />
+                </button>
+                <span className="ml-1 font-semibold text-sm bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">Listen</span>
+              </div>
               <ol className="space-y-8">
                 <li className="flex items-start">
-                  <span className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center text-white text-2xl shadow-lg mr-4 animate-bounce">1</span>
+                  <span className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center text-white text-2xl shadow-lg mr-4">1</span>
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-1">Start Screening</h3>
                     <p className="text-gray-600">Click on <b>Start Screening</b> and answer a few simple questions to begin your health checkup journey.</p>
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <span className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center text-white text-2xl shadow-lg mr-4 animate-bounce">2</span>
+                  <span className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center text-white text-2xl shadow-lg mr-4">2</span>
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-1">Upload or Capture Image</h3>
                     <p className="text-gray-600">Upload your medical image or capture a new one using your phone or computer.</p>
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <span className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center text-white text-2xl shadow-lg mr-4 animate-bounce">3</span>
+                  <span className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center text-white text-2xl shadow-lg mr-4">3</span>
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-1">AI Analysis</h3>
                     <p className="text-gray-600">Our advanced AI instantly analyzes your image and provides accurate results with easy-to-understand feedback.</p>
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <span className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center text-white text-2xl shadow-lg mr-4 animate-bounce">4</span>
+                  <span className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center text-white text-2xl shadow-lg mr-4">4</span>
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-1">Get Personalized Report</h3>
                     <p className="text-gray-600">Download or view your personalized report and get recommendations for next steps.</p>
@@ -510,6 +695,7 @@ export default function BreastCancerLandingPage() {
         </div>
       </footer>
       <AuthModal />
+      <TermsModal />
       <FamilyHealthDashboard open={showFamilyDashboard} onClose={() => setShowFamilyDashboard(false)} />
     </div>
   );

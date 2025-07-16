@@ -1,19 +1,31 @@
 // src/components/TextToSpeech.js
 
 export function speak(text) {
-  if ('speechSynthesis' in window) {
-    // If already speaking, stop
-    if (window.speechSynthesis.speaking) {
-      window.speechSynthesis.cancel();
-      return;
-    }
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US'; // Hindi ke liye 'hi-IN'
-    utterance.rate = 1; // Bolne ki speed
-    utterance.pitch = 1; // Pitch
-    window.speechSynthesis.speak(utterance);
-  } else {
-    alert('Sorry, your browser does not support Text-to-Speech.');
+  if (!window.speechSynthesis) return;
+  const synth = window.speechSynthesis;
+  let voices = synth.getVoices();
+
+  // Try to find a female English voice
+  let femaleVoice = voices.find(
+    v =>
+      v.lang.startsWith('en') &&
+      (v.name.toLowerCase().includes('female') ||
+        v.name.toLowerCase().includes('zira') ||
+        v.name.toLowerCase().includes('susan') ||
+        v.name.toLowerCase().includes('linda') ||
+        v.name.toLowerCase().includes('emma') ||
+        v.name.toLowerCase().includes('samantha') ||
+        v.name.toLowerCase().includes('google us english'))
+  );
+
+  // Fallback: any English voice
+  if (!femaleVoice) {
+    femaleVoice = voices.find(v => v.lang.startsWith('en'));
   }
+
+  const utter = new SpeechSynthesisUtterance(text);
+  if (femaleVoice) utter.voice = femaleVoice;
+  utter.rate = 1;
+  synth.speak(utter);
 }
   

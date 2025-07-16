@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Heart, Shield, Zap, Users, ArrowRight, Play, CheckCircle, Star, AlertTriangle, User, Users as UsersIcon } from 'lucide-react';
+import BreastCancerScreening from './BreastCancerScreening';
 import DoctorScene from './components/DoctorModel';
 import { BreastModel } from './components/BreastModel';
 import { speak } from './components/TextToSpeech';
@@ -132,7 +133,7 @@ export default function BreastCancerLandingPage() {
   }, []);
 
   if (showSweatDetection) {
-    return <SweatBiomarkerDetection theme="pink" onBack={() => setShowSweatDetection(false)} />;
+    return <BreastCancerScreening onBack={() => setShowSweatDetection(false)} />;
   }
 
   if (showDoctorModel) {

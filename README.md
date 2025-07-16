@@ -2,8 +2,7 @@
 
 ![CareDetect Logo](public/logo192.png)
 ## 📸 Demo video
-*https://drive.google.com/file/d/13WlG7XhzofF1zZP1Yy-jfMoBY-MgNOEM/view?usp=sharing*
-
+*https://drive.google.com/file/d/1zBXAs_kdUNp2IiCaSiD-_vhXlfHBzFUt/view*
 ## Empowering Early Detection, Saving Lives
 
 **CareDetect** is a next-generation web tool for early breast cancer detection, combining sweat biomarker analysis, genetic risk assessment, and a 3D interactive model for visual learning. Our mission is to make screening quick, affordable, and accessible for everyone.

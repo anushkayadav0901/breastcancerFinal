@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Heart, Shield, Zap, Users, ArrowRight, Play, CheckCircle, Star } from 'lucide-react';
-import SweatBiomarkerDetection from './SweatBiomarkerDetection';
+import BreastCancerScreening from './BreastCancerScreening';
 
 export default function BreastCancerLandingPage() {
   const [isVisible, setIsVisible] = useState(false);
@@ -11,7 +11,7 @@ export default function BreastCancerLandingPage() {
   }, []);
 
   if (showSweatDetection) {
-    return <SweatBiomarkerDetection theme="pink" onBack={() => setShowSweatDetection(false)} />;
+    return <BreastCancerScreening onBack={() => setShowSweatDetection(false)} />;
   }
 
   return (

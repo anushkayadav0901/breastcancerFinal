@@ -1,12 +1,131 @@
 import React, { useState, useEffect } from 'react';
-import { Heart, Shield, Zap, Users, ArrowRight, Play, CheckCircle, Star } from 'lucide-react';
+import { Heart, Shield, Zap, Users, ArrowRight, Play, CheckCircle, Star, AlertTriangle, User, Users as UsersIcon } from 'lucide-react';
 import DoctorScene from './components/DoctorModel';
+import { BreastModel } from './components/BreastModel';
 import { speak } from './components/TextToSpeech';
 import SweatBiomarkerDetection from './SweatBiomarkerDetection';
+import Login from './components/auth/Login';
+import SignUp from './components/auth/SignUp';
+
+function FamilyHealthDashboard({ open, onClose }) {
+  const [family, setFamily] = useState([
+    { relation: 'Grandmother', cancer: false, age: '', genetic: false, risk: [] },
+    { relation: 'Mother', cancer: false, age: '', genetic: false, risk: [] },
+    { relation: 'You', cancer: false, age: '', genetic: false, risk: [] },
+  ]);
+  const [selected, setSelected] = useState(2); // Default to 'You'
+
+  // Controlled input states
+  const member = family[selected];
+
+  // Risk calculation logic
+  function calculateRisk() {
+    let risk = 12; // baseline risk %
+    let firstDegree = 0;
+    let extra = 0;
+    family.forEach((m, idx) => {
+      if (m.cancer) {
+        if (m.relation === 'Mother' || m.relation === 'Sister' || m.relation === 'You') firstDegree++;
+        else extra++;
+      }
+    });
+    if (firstDegree > 0) risk += 20;
+    if (firstDegree > 1) risk += 10 * (firstDegree - 1);
+    if (extra > 0) risk += 5 * extra;
+    if (member.age && Number(member.age) < 50) risk += 10;
+    if (member.genetic) risk += 10;
+    if (member.risk.includes('Smoking')) risk += 5;
+    if (member.risk.includes('Drinking')) risk += 5;
+    if (member.risk.includes('Lifestyle')) risk += 5;
+    return Math.min(Math.round(risk), 99);
+  }
+
+  const riskScore = calculateRisk();
+
+  // Handlers
+  function updateField(field, value) {
+    setFamily(fam => fam.map((m, i) => i === selected ? { ...m, [field]: value } : m));
+  }
+  function updateRisk(factor) {
+    setFamily(fam => fam.map((m, i) => i === selected ? { ...m, risk: m.risk.includes(factor) ? m.risk.filter(f => f !== factor) : [...m.risk, factor] } : m));
+  }
+  function updateRelation(val) {
+    setFamily(fam => fam.map((m, i) => i === selected ? { ...m, relation: val } : m));
+  }
+
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
+      <div className="backdrop-blur-2xl bg-white/80 border border-pink-100 rounded-3xl shadow-2xl p-0 w-full max-w-2xl flex flex-col items-center animate-fade-in relative" onClick={e => e.stopPropagation()}>
+        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-pink-500 text-2xl font-bold">&times;</button>
+        <div className="p-8 w-full flex flex-col items-center">
+          <h2 className="text-4xl font-extrabold text-pink-600 mb-6 font-lexend tracking-tight drop-shadow-lg text-center" style={{letterSpacing: '0.03em'}}>Family Health Dashboard</h2>
+          {/* Family Tree Visualizer */}
+          <div className="w-full flex flex-col items-center mb-8">
+            <div className="flex flex-col items-center gap-2">
+              {family.map((m, idx) => (
+                <div key={idx} className={`flex items-center gap-3 px-6 py-2 rounded-xl cursor-pointer transition-all ${selected === idx ? 'bg-pink-100/80 shadow-lg scale-105' : 'hover:bg-pink-50'}`} onClick={() => setSelected(idx)}>
+                  <span className="text-lg font-bold flex items-center gap-2">
+                    {m.relation === 'You' ? <User className="inline w-5 h-5 text-purple-500" /> : <UsersIcon className="inline w-5 h-5 text-pink-400" />} {m.relation}
+                  </span>
+                  {m.cancer ? <AlertTriangle className="w-5 h-5 text-yellow-500" title="Diagnosed" /> : <CheckCircle className="w-5 h-5 text-green-500" title="Healthy" />}
+                </div>
+              ))}
+            </div>
+            <div className="mt-2 text-xs text-gray-500">Click a family member to edit their info. (Add more coming soon!)</div>
+          </div>
+          {/* Minimal Data Entry */}
+          <div className="w-full flex flex-col gap-4 mb-8 max-w-md">
+            <div className="flex gap-2 items-center">
+              <span className="font-semibold">Relation:</span>
+              <select className="rounded px-2 py-1 border border-pink-200 bg-white/80" value={member.relation} onChange={e => updateRelation(e.target.value)}>
+                <option>Mother</option>
+                <option>Sister</option>
+                <option>Grandmother</option>
+                <option>You</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div className="flex gap-2 items-center">
+              <span className="font-semibold">Breast Cancer?</span>
+              <input type="checkbox" className="accent-pink-500" checked={member.cancer} onChange={e => updateField('cancer', e.target.checked)} />
+            </div>
+            <div className="flex gap-2 items-center">
+              <span className="font-semibold">Age at Diagnosis:</span>
+              <input type="number" min="0" className="rounded px-2 py-1 border border-pink-200 bg-white/80 w-24" value={member.age} onChange={e => updateField('age', e.target.value)} />
+            </div>
+            <div className="flex gap-2 items-center">
+              <span className="font-semibold">Genetic Testing?</span>
+              <input type="checkbox" className="accent-pink-500" checked={member.genetic} onChange={e => updateField('genetic', e.target.checked)} />
+            </div>
+            <div className="flex gap-2 items-center flex-wrap">
+              <span className="font-semibold">Risk Factors:</span>
+              {['Smoking', 'Drinking', 'Lifestyle'].map(factor => (
+                <label key={factor} className="ml-2"><input type="checkbox" className="accent-pink-500 mr-1" checked={member.risk.includes(factor)} onChange={() => updateRisk(factor)} />{factor}</label>
+              ))}
+            </div>
+          </div>
+          {/* Risk Score */}
+          <div className="w-full flex flex-col items-center mb-4">
+            <div className="text-lg font-bold text-purple-600">Your estimated risk: <span className="text-pink-600 text-2xl animate-pulse">{riskScore}%</span> <span className="text-base text-gray-600 font-normal">lifetime risk</span></div>
+            <div className="text-xs text-gray-500">(Personalized risk score based on your family and lifestyle data)</div>
+          </div>
+          {/* Privacy Notice */}
+          <div className="w-full text-xs text-gray-500 text-center mt-2">
+            We store only minimal data, fully user-controlled, privacy focused. All fields are optional. Sharing requires your consent.
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function BreastCancerLandingPage() {
   const [isVisible, setIsVisible] = useState(false);
   const [showSweatDetection, setShowSweatDetection] = useState(false);
+  const [showDoctorModel, setShowDoctorModel] = useState(false);
+  const [authModal, setAuthModal] = useState(null); // 'login' | 'signup' | null
+  const [showFamilyDashboard, setShowFamilyDashboard] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
@@ -15,6 +134,45 @@ export default function BreastCancerLandingPage() {
   if (showSweatDetection) {
     return <SweatBiomarkerDetection theme="pink" onBack={() => setShowSweatDetection(false)} />;
   }
+
+  if (showDoctorModel) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-pink-200 via-rose-100 to-purple-200">
+        <div className="absolute top-8 left-8 z-10">
+          <button
+            className="flex items-center gap-2 bg-white/80 backdrop-blur-lg border border-pink-200 text-pink-600 px-5 py-2 rounded-full shadow-lg hover:bg-pink-100 hover:shadow-pink-200/60 transition-all duration-200 font-semibold text-base"
+            onClick={() => setShowDoctorModel(false)}
+          >
+            <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 19l-7-7 7-7' /></svg>
+            Back
+          </button>
+        </div>
+        <div className="flex flex-col items-center justify-center w-full max-w-3xl">
+          <div className="bg-white/60 backdrop-blur-2xl rounded-3xl shadow-2xl border border-pink-100 p-10 flex flex-col items-center transition-all duration-300 hover:shadow-pink-200/80 hover:ring-4 hover:ring-pink-100/40 animate-fade-in" style={{boxShadow: '0 8px 32px 0 rgba(255, 182, 193, 0.25)'}}>
+            <div className="w-full flex items-center justify-center" style={{minHeight: '600px'}}>
+              <BreastModel />
+            </div>
+            <h2 className="text-5xl font-extrabold text-pink-600 mt-8 font-lexend tracking-tight drop-shadow-lg text-center" style={{letterSpacing: '0.04em', textShadow: '0 2px 16px #f472b6aa'}}>
+              3D Breast Model
+            </h2>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Auth Modal
+  const AuthModal = () => {
+    if (!authModal) return null;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setAuthModal(null)}>
+        <div className="backdrop-blur-xl bg-white/70 border border-pink-100 rounded-3xl shadow-2xl p-0 w-full max-w-lg flex flex-col items-center animate-fade-in relative" onClick={e => e.stopPropagation()}>
+          <button onClick={() => setAuthModal(null)} className="absolute top-4 right-4 text-gray-400 hover:text-pink-500 text-2xl font-bold">&times;</button>
+          {authModal === 'login' ? <Login onSwitch={() => setAuthModal('signup')} /> : <SignUp onSwitch={() => setAuthModal('login')} />}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 font-sans">
@@ -33,10 +191,33 @@ export default function BreastCancerLandingPage() {
               <a href="#how-it-works" className="text-gray-700 hover:text-pink-600 transition-colors">How It Works</a>
               <a href="#about" className="text-gray-700 hover:text-pink-600 transition-colors">About</a>
               <a href="#contact" className="text-gray-700 hover:text-pink-600 transition-colors">Contact</a>
+              <button
+                className="text-gray-700 hover:text-pink-600 transition-colors focus:outline-none"
+                onClick={() => setShowDoctorModel(true)}
+              >
+                3D Model
+              </button>
+              <button
+                className="text-gray-700 hover:text-purple-600 transition-colors focus:outline-none font-semibold border border-purple-200 rounded-full px-4 py-1 ml-2 bg-white/70 hover:bg-purple-100"
+                onClick={() => setShowFamilyDashboard(true)}
+              >
+                Genetic Risk
+              </button>
             </nav>
-            <button className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-2 rounded-full hover:shadow-lg transition-all duration-300 transform hover:scale-105">
-              Get Started
-            </button>
+            <div className="flex gap-3">
+              <button
+                className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-2 rounded-full font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                onClick={() => setAuthModal('login')}
+              >
+                Login
+              </button>
+              <button
+                className="bg-gradient-to-r from-purple-600 to-pink-500 text-white px-6 py-2 rounded-full font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                onClick={() => setAuthModal('signup')}
+              >
+                Sign Up
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -327,6 +508,8 @@ export default function BreastCancerLandingPage() {
           </div>
         </div>
       </footer>
+      <AuthModal />
+      <FamilyHealthDashboard open={showFamilyDashboard} onClose={() => setShowFamilyDashboard(false)} />
     </div>
   );
 } 

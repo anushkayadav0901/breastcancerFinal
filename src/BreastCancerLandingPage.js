@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Heart, Shield, Zap, Users, ArrowRight, Play, CheckCircle, Star, AlertTriangle, User, Users as UsersIcon, UserPlus, UserCircle, Pause, RotateCcw, ArrowRightCircle } from 'lucide-react';
+import { Heart, Shield, Zap, Users, ArrowRight, Play, CheckCircle, Star, AlertTriangle, User, Users as UsersIcon, Droplets } from 'lucide-react';
 import BreastCancerScreening from './BreastCancerScreening';
 import DoctorScene from './components/DoctorModel';
 import { BreastModel } from './components/BreastModel';
@@ -321,22 +321,23 @@ export default function BreastCancerLandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 font-sans">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-pink-100 sticky top-0 z-50">
+      <header className="bg-white/60 backdrop-blur-md border-b border-pink-100 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex justify-between items-center py-4 relative">
             <div className="flex items-center space-x-2">
               <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl flex items-center justify-center">
                 <Heart className="w-6 h-6 text-white" />
               </div>
               <span className="text-xl font-bold text-gray-900">CareDetect</span>
             </div>
-            <nav className="hidden md:flex space-x-8">
-              <a href="#features" className="text-gray-700 hover:text-pink-600 transition-colors">Features</a>
-              <a href="#how-it-works" className="text-gray-700 hover:text-pink-600 transition-colors">How It Works</a>
-              <a href="#about" className="text-gray-700 hover:text-pink-600 transition-colors">About</a>
-              <a href="#contact" className="text-gray-700 hover:text-pink-600 transition-colors">Contact</a>
+            {/* Desktop Nav */}
+            <nav className="hidden md:flex items-center space-x-8">
+              <a href="#features" className="nav-link">Features</a>
+              <a href="#how-it-works" className="nav-link">How It Works</a>
+              <a href="#about" className="nav-link">About</a>
+              <a href="#contact" className="nav-link">Contact</a>
               <button
-                className="text-gray-700 hover:text-pink-600 transition-colors focus:outline-none"
+                className="nav-link bg-transparent border-none p-0 focus:outline-none"
                 onClick={() => setShowDoctorModel(true)}
               >
                 3D Model
@@ -348,20 +349,65 @@ export default function BreastCancerLandingPage() {
                 Genetic Risk
               </button>
             </nav>
-            <div className="flex gap-3">
+            {/* Desktop Auth Buttons */}
+            <div className="hidden md:flex gap-3 items-center">
               <button
-                className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-2 rounded-full font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                className="bg-white border border-purple-500 text-purple-600 px-6 py-2 rounded-full font-semibold hover:bg-purple-600 hover:text-white transition-all duration-200"
                 onClick={() => setAuthModal('login')}
               >
                 Login
               </button>
               <button
-                className="bg-gradient-to-r from-purple-600 to-pink-500 text-white px-6 py-2 rounded-full font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                className="bg-white border border-purple-500 text-purple-600 px-6 py-2 rounded-full font-semibold hover:bg-purple-600 hover:text-white transition-all duration-200"
                 onClick={() => setAuthModal('signup')}
               >
                 Sign Up
               </button>
             </div>
+            {/* Hamburger Icon for Mobile */}
+            <button
+              className="md:hidden flex items-center justify-center p-2 rounded focus:outline-none focus:ring-2 focus:ring-pink-400"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Open menu"
+            >
+              <svg className="w-7 h-7 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            {/* Mobile Menu Dropdown */}
+            {mobileMenuOpen && (
+              <div className="md:hidden absolute top-full right-0 mt-2 w-56 bg-white/95 rounded-2xl shadow-2xl border border-pink-100 z-50 animate-fade-in flex flex-col p-4 gap-2">
+                <a href="#features" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Features</a>
+                <a href="#how-it-works" className="nav-link" onClick={() => setMobileMenuOpen(false)}>How It Works</a>
+                <a href="#about" className="nav-link" onClick={() => setMobileMenuOpen(false)}>About</a>
+                <a href="#contact" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Contact</a>
+                <button
+                  className="nav-link bg-transparent border-none p-0 text-left focus:outline-none"
+                  onClick={() => { setShowDoctorModel(true); setMobileMenuOpen(false); }}
+                >
+                  3D Model
+                </button>
+                <button
+                  className="nav-link bg-transparent border-none p-0 text-left focus:outline-none"
+                  onClick={() => { setShowFamilyDashboard(true); setMobileMenuOpen(false); }}
+                >
+                  Genetic Risk
+                </button>
+                <hr className="my-2 border-pink-100" />
+                <button
+                  className="bg-white border border-purple-500 text-purple-600 px-4 py-2 rounded-full font-semibold hover:bg-purple-600 hover:text-white transition-all duration-200 w-full text-left"
+                  onClick={() => { setAuthModal('login'); setMobileMenuOpen(false); }}
+                >
+                  Login
+                </button>
+                <button
+                  className="bg-white border border-purple-500 text-purple-600 px-4 py-2 rounded-full font-semibold hover:bg-purple-600 hover:text-white transition-all duration-200 w-full text-left"
+                  onClick={() => { setAuthModal('signup'); setMobileMenuOpen(false); }}
+                >
+                  Sign Up
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -407,7 +453,7 @@ export default function BreastCancerLandingPage() {
                 </div>
                 <div className="flex items-center">
                   <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                  99.2% Accuracy
+                  92.83% Accuracy
                 </div>
                 <div className="flex items-center">
                   <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
@@ -420,23 +466,16 @@ export default function BreastCancerLandingPage() {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-pink-400 to-purple-500 rounded-3xl blur-3xl opacity-20 animate-pulse"></div>
                 <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-pink-100">
-                  <div className="aspect-square bg-gradient-to-br from-pink-100 to-purple-100 rounded-2xl flex items-center justify-center mb-6">
-                    <div className="text-6xl">🩺</div>
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Advanced AI Analysis</h3>
-                  <p className="text-gray-600 mb-6">
-                    Our cutting-edge machine learning algorithms analyze medical imagery with unprecedented accuracy, 
-                    providing healthcare professionals with powerful diagnostic insights.
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex -space-x-2">
-                      {[1,2,3,4].map(i => (
-                        <div key={i} className="w-8 h-8 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full border-2 border-white"></div>
-                      ))}
-                    </div>
-                    <div className="flex items-center">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      <span className="ml-1 text-sm text-gray-600">4.9/5 Rating</span>
+                  <div className="w-full flex justify-center items-center mb-0">
+                    <div className="w-full max-w-xl aspect-video bg-gradient-to-br from-pink-100 to-purple-100 rounded-2xl flex items-center justify-center">
+                      <video 
+                        src="/video.mp4" 
+                        controls 
+                        className="w-full h-full object-cover rounded-2xl shadow-lg border border-purple-200 bg-white"
+                        style={{ background: 'rgba(255,255,255,0.7)' }}
+                      >
+                        Your browser does not support the video tag.
+                      </video>
                     </div>
                   </div>
                 </div>
@@ -451,7 +490,7 @@ export default function BreastCancerLandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
             <div className="group">
-              <div className="text-4xl font-bold text-pink-600 mb-2 group-hover:scale-110 transition-transform">99.2%</div>
+              <div className="text-4xl font-bold text-pink-600 mb-2 group-hover:scale-110 transition-transform">92.83%</div>
               <div className="text-gray-600">Accuracy Rate</div>
             </div>
             <div className="group">
@@ -477,54 +516,45 @@ export default function BreastCancerLandingPage() {
             <h2 
               className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4 font-lexend tracking-tight"
             >
-              Why Choose CareDetect?
+              Project Features
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Advanced technology meets compassionate care to deliver the most accurate and accessible breast cancer screening solution.
+              Explore the core features of our breast cancer detection platform.
             </p>
           </div>
-          
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: <Zap className="w-8 h-8" />,
-                title: "Lightning Fast Results",
-                description: "Get accurate screening results in under 60 seconds with our advanced AI algorithms."
-              },
-              {
-                icon: <Shield className="w-8 h-8" />,
-                title: "FDA Approved Technology",
-                description: "Our platform meets the highest medical standards for safety and accuracy."
-              },
-              {
-                icon: <Users className="w-8 h-8" />,
-                title: "Expert Support Team",
-                description: "24/7 access to certified healthcare professionals for guidance and support."
-              },
-              {
-                icon: <Heart className="w-8 h-8" />,
-                title: "Personalized Care",
-                description: "Tailored screening recommendations based on your individual risk factors."
-              },
-              {
-                icon: <Shield className="w-8 h-8" />,
-                title: "Privacy Protected",
-                description: "Your health data is encrypted and protected with military-grade security."
-              },
-              {
-                icon: <Zap className="w-8 h-8" />,
-                title: "Continuous Innovation",
-                description: "Our AI models are constantly updated with the latest medical research."
-              }
-            ].map((feature, index) => (
-              <div key={index} className="group bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-pink-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                <div className="text-pink-600 mb-4 group-hover:scale-110 transition-transform">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
+            {/* AI-powered Screening */}
+            <div className="group bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-pink-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <div className="text-pink-600 mb-4 group-hover:scale-110 transition-transform">
+                <Zap className="w-8 h-8" />
               </div>
-            ))}
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">AI-powered Screening</h3>
+              <p className="text-gray-600">Upload or capture images for instant, accurate breast cancer risk analysis using advanced AI.</p>
+            </div>
+            {/* Sweat Biomarker Detection */}
+            <div className="group bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-pink-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <div className="text-blue-500 mb-4 group-hover:scale-110 transition-transform">
+                <Droplets className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Sweat Biomarker Detection</h3>
+              <p className="text-gray-600">Non-invasive detection using sweat test strips and smartphone camera for early risk assessment.</p>
+            </div>
+            {/* 3D Breast Model */}
+            <div className="group bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-pink-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <div className="text-purple-600 mb-4 group-hover:scale-110 transition-transform">
+                <Shield className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">3D Breast Model</h3>
+              <p className="text-gray-600">Interactive 3D model for education, symptom awareness, and region-specific information.</p>
+            </div>
+            {/* Genetic Risk Calculator */}
+            <div className="group bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-pink-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <div className="text-pink-500 mb-4 group-hover:scale-110 transition-transform">
+                <Users className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Genetic Risk Calculator</h3>
+              <p className="text-gray-600">Personalized risk score based on family history, genetics, and lifestyle factors.</p>
+            </div>
           </div>
         </div>
       </section>

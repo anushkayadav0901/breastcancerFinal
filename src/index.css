@@ -15,3 +15,40 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Navbar underline animation */
+.nav-link {
+  position: relative;
+  color: #4b5563; /* text-gray-700 */
+  font-weight: 500;
+  padding-bottom: 2px;
+  transition: color 0.2s;
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+.nav-link:hover, .nav-link:focus {
+  color: #db2777; /* text-pink-600 */
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -4px;
+  width: 70%;
+  height: 6px;
+  background: linear-gradient(90deg, #ec4899 0%, #a78bfa 100%);
+  border-radius: 8px 8px 8px 8px / 12px 12px 12px 12px;
+  box-shadow: 0 2px 8px 0 #f472b6aa;
+  transform: translateX(-50%) scaleX(0);
+  transform-origin: center;
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), box-shadow 0.3s;
+  opacity: 0.85;
+  pointer-events: none;
+}
+.nav-link:hover::after, .nav-link:focus::after, .nav-link.active::after {
+  transform: translateX(-50%) scaleX(1);
+  box-shadow: 0 4px 16px 0 #a78bfa55;
+  opacity: 1;
+}

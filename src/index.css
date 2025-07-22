@@ -52,3 +52,10 @@ code {
   box-shadow: 0 4px 16px 0 #a78bfa55;
   opacity: 1;
 }
+
+.onboarding-highlight {
+  position: relative !important;
+  z-index: 10000 !important;
+  box-shadow: 0 0 0 4px #ff69b4, 0 0 30px 10px #fff;
+  transition: box-shadow 0.3s;
+}

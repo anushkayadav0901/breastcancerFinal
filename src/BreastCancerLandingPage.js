@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Heart, Shield, Zap, Users, ArrowRight, Play, CheckCircle, Star, AlertTriangle, User, Users as UsersIcon, Droplets } from 'lucide-react';
+import { Heart, Shield, Zap, Users, ArrowRight, Play, CheckCircle, Star, AlertTriangle, User, Users as UsersIcon, Droplets, UserPlus, UserCircle, RotateCcw, Pause, ArrowRightCircle } from 'lucide-react';
 import BreastCancerScreening from './BreastCancerScreening';
 import DoctorScene from './components/DoctorModel';
 import { BreastModel } from './components/BreastModel';
@@ -7,6 +7,7 @@ import { speak } from './components/TextToSpeech';
 import SweatBiomarkerDetection from './SweatBiomarkerDetection';
 import Login from './components/auth/Login';
 import SignUp from './components/auth/SignUp';
+import OnboardingOverlay from "./components/OnboardingOverlay";
 
 function FamilyHealthDashboard({ open, onClose }) {
   const [family, setFamily] = useState([
@@ -74,7 +75,7 @@ function FamilyHealthDashboard({ open, onClose }) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
-      <div className="backdrop-blur-2xl bg-white/80 border border-pink-100 rounded-3xl shadow-2xl p-0 w-full max-w-2xl flex flex-col items-center animate-fade-in relative" onClick={e => e.stopPropagation()} style={{boxShadow: '0 8px 32px 0 rgba(255, 182, 193, 0.25)'}}>
+      <div className="backdrop-blur-2xl bg-white/80 border border-pink-100 rounded-3xl shadow-2xl p-0 w-full max-w-2xl flex flex-col items-center animate-fade-in relative overflow-y-auto max-h-screen" onClick={e => e.stopPropagation()} style={{boxShadow: '0 8px 32px 0 rgba(255, 182, 193, 0.25)'}}>
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-pink-500 text-2xl font-bold">&times;</button>
         <div className="p-8 w-full flex flex-col items-center">
           <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 mb-6 font-lexend tracking-tight drop-shadow-lg text-center" style={{letterSpacing: '0.03em'}}>Family Health Dashboard</h2>
@@ -189,6 +190,8 @@ export default function BreastCancerLandingPage() {
   const [showFamilyDashboard, setShowFamilyDashboard] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState(null); // null = not showing
 
   // Listen controls state
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -337,12 +340,14 @@ export default function BreastCancerLandingPage() {
               <a href="#about" className="nav-link">About</a>
               <a href="#contact" className="nav-link">Contact</a>
               <button
+                id="3d-model-btn"
                 className="nav-link bg-transparent border-none p-0 focus:outline-none"
                 onClick={() => setShowDoctorModel(true)}
               >
                 3D Model
               </button>
               <button
+                id="genetic-risk-btn"
                 className="text-gray-700 hover:text-purple-600 transition-colors focus:outline-none font-semibold border border-purple-200 rounded-full px-4 py-1 ml-2 bg-white/70 hover:bg-purple-100"
                 onClick={handleOpenDashboard}
               >
@@ -352,12 +357,14 @@ export default function BreastCancerLandingPage() {
             {/* Desktop Auth Buttons */}
             <div className="hidden md:flex gap-3 items-center">
               <button
+                id="login-btn"
                 className="bg-white border border-purple-500 text-purple-600 px-6 py-2 rounded-full font-semibold hover:bg-purple-600 hover:text-white transition-all duration-200"
                 onClick={() => setAuthModal('login')}
               >
                 Login
               </button>
               <button
+                id="signup-btn"
                 className="bg-white border border-purple-500 text-purple-600 px-6 py-2 rounded-full font-semibold hover:bg-purple-600 hover:text-white transition-all duration-200"
                 onClick={() => setAuthModal('signup')}
               >
@@ -431,15 +438,16 @@ export default function BreastCancerLandingPage() {
                 accessible screening solutions for better health outcomes.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                <button className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-4 rounded-full font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center group">
+                <button id="start-screening-btn" className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-4 rounded-full font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center group">
                   Start Screening
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
-                <button className="bg-white/80 backdrop-blur-sm text-gray-700 px-8 py-4 rounded-full font-semibold hover:bg-white transition-all duration-300 flex items-center justify-center group border border-gray-200">
+                <button id="watch-demo-btn" className="bg-white/80 backdrop-blur-sm text-gray-700 px-8 py-4 rounded-full font-semibold hover:bg-white transition-all duration-300 flex items-center justify-center group border border-gray-200">
                   <Play className="mr-2 w-5 h-5 group-hover:scale-110 transition-transform" />
                   Watch Demo
                 </button>
                 <button
+                  id="sweat-detect-btn"
                   className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-4 rounded-full font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center group"
                   onClick={() => setShowSweatDetection(true)}
                 >
@@ -583,42 +591,61 @@ export default function BreastCancerLandingPage() {
                 {/* Play or Replay */}
                 {!isSpeaking ? (
                   <button
-                    className={`p-1 rounded-full transition flex items-center justify-center group ring-2 ring-pink-400/60`}
+                    className="p-0.5 rounded-full transition-all duration-200 flex items-center justify-center group ring-2 ring-pink-300 bg-white hover:bg-pink-50 shadow-sm hover:scale-105 focus:outline-none"
                     onClick={handlePlay}
                     aria-label="Play"
                     title="Play"
+                    style={{ width: 28, height: 28 }}
                   >
-                    <Play className="w-4 h-4 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500 group-hover:from-pink-600 group-hover:to-purple-600" />
+                    {/* Simple play icon (like |>) */}
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <polygon points="4,3 13,8 4,13" fill="currentColor" className="text-pink-500 group-hover:text-purple-600 transition-colors duration-200" />
+                    </svg>
                   </button>
                 ) : (
                   <button
-                    className={`p-1 rounded-full transition flex items-center justify-center group ring-2 ring-pink-400/60`}
+                    className="p-0.5 rounded-full transition-all duration-200 flex items-center justify-center group ring-2 ring-pink-300 bg-white hover:bg-pink-50 shadow-sm hover:scale-105 focus:outline-none"
                     onClick={handlePlay}
                     aria-label="Replay"
                     title="Replay"
+                    style={{ width: 28, height: 28 }}
                   >
-                    <RotateCcw className="w-4 h-4 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500 group-hover:from-pink-600 group-hover:to-purple-600" />
+                    {/* Simple replay icon (circular arrow) */}
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M8 3a5 5 0 1 1-4.33 2.5" stroke="currentColor" strokeWidth="1.5" fill="none" className="text-pink-500 group-hover:text-purple-600 transition-colors duration-200" />
+                      <polygon points="3,2 3,6 6,4" fill="currentColor" className="text-pink-500 group-hover:text-purple-600 transition-colors duration-200" />
+                    </svg>
                   </button>
                 )}
                 {/* Pause */}
                 <button
-                  className={`p-1 rounded-full transition flex items-center justify-center group ${isPaused ? 'ring-2 ring-pink-300/60' : ''}`}
+                  className="p-0.5 rounded-full transition-all duration-200 flex items-center justify-center group ring-2 ring-pink-200 bg-white hover:bg-pink-50 shadow-sm hover:scale-105 focus:outline-none disabled:opacity-50"
                   onClick={handlePause}
                   aria-label="Pause"
                   title="Pause"
                   disabled={!isSpeaking || isPaused}
+                  style={{ width: 28, height: 28 }}
                 >
-                  <Pause className={`w-4 h-4 ${!isSpeaking || isPaused ? 'text-gray-300' : 'text-pink-400 group-hover:text-pink-600'}`} />
+                  {/* Pause icon */}
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="2" height="8" rx="1" fill="currentColor" className="text-pink-400 group-hover:text-purple-600 transition-colors duration-200" />
+                    <rect x="10" y="4" width="2" height="8" rx="1" fill="currentColor" className="text-pink-400 group-hover:text-purple-600 transition-colors duration-200" />
+                  </svg>
                 </button>
                 {/* Resume (ArrowRightCircle) */}
                 <button
-                  className={`p-1 rounded-full transition flex items-center justify-center group ${isSpeaking && isPaused ? 'ring-2 ring-green-300/60' : ''}`}
+                  className="p-0.5 rounded-full transition-all duration-200 flex items-center justify-center group ring-2 ring-green-300 bg-white hover:bg-green-50 shadow-sm hover:scale-105 focus:outline-none disabled:opacity-50"
                   onClick={handleResume}
                   aria-label="Resume"
                   title="Resume"
                   disabled={!isSpeaking || !isPaused}
+                  style={{ width: 28, height: 28 }}
                 >
-                  <ArrowRightCircle className={`w-4 h-4 ${!isSpeaking || !isPaused ? 'text-gray-300' : 'text-green-400 group-hover:text-green-600'}`} />
+                  {/* Simple right arrow in a circle */}
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" className="text-green-400 group-hover:text-green-600 transition-colors duration-200" />
+                    <polygon points="7,5 11,8 7,11" fill="currentColor" className="text-green-400 group-hover:text-green-600 transition-colors duration-200" />
+                  </svg>
                 </button>
                 <span className="ml-1 font-semibold text-sm bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">Listen</span>
               </div>
@@ -727,6 +754,25 @@ export default function BreastCancerLandingPage() {
       <AuthModal />
       <TermsModal />
       <FamilyHealthDashboard open={showFamilyDashboard} onClose={() => setShowFamilyDashboard(false)} />
+      {/* Floating Guide Me Button */}
+      <button
+        className="fixed bottom-8 right-8 z-[9999] bg-pink-500 text-white px-4 py-2 rounded-full shadow-lg hover:scale-105 transition"
+        onClick={() => setOnboardingStep(0)}
+        style={{ display: onboardingStep === null ? 'block' : 'none' }}
+      >
+        Guide Me
+      </button>
+      {/* Onboarding Overlay */}
+      {onboardingStep !== null && (
+        <OnboardingOverlay
+          stepIndex={onboardingStep}
+          onNext={() => {
+            if (onboardingStep < 2) setOnboardingStep(onboardingStep + 1);
+            else setOnboardingStep(null);
+          }}
+          onClose={() => setOnboardingStep(null)}
+        />
+      )}
     </div>
   );
 } 

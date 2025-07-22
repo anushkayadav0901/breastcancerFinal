@@ -120,7 +120,140 @@ const REGION_SYMPTOMS = {
   ]
 };
 
-function InfoModal({ open, onClose, title, message, symptomOptions, onSymptomSelect }) {
+const NIPPLE_INFO = {
+  title: 'Nipple Bleeding and Discharge: Breast Cancer se Jude Facts',
+  content: (
+    <div className="space-y-3 text-gray-700 text-base">
+      <b>1. Kya Hoti Hai Nipple Discharge?</b>
+      <ul className="list-disc ml-6">
+        <li>Nipple se koi bhi liquid ya fluid nikalna, jaise blood, pani jaisa, safed, peela, hara ya bhura, ise nipple discharge bolte hain.</li>
+        <li>Ye discharge ek ya dono nipples se aa sakti hai, kabhi apne aap ya dabane par bhi nikal sakti hai.</li>
+      </ul>
+      <b>2. Bleeding from Nipple (Khoon Ana)</b>
+      <ul className="list-disc ml-6">
+        <li>Agar nipple se khoon (bloody discharge) niklta hai, to yeh ek important symptom hai jo benign (non-cancerous) aur kabhi kabhi breast cancer dono ki taraf ishara kar sakta hai.</li>
+        <li><b>Common benign causes:</b> intraductal papilloma (milk duct mein chota safed mass), duct ectasia (duct ka fail jana).</li>
+        <li><b>Cancer risk:</b> Bloody discharge se breast cancer hone ka risk dusre colors ki discharge ki tulna mein zyada hai.</li>
+        <li>Usually, agar discharge ek breast se, bina dabaye nikal raha ho, to doctor ko turant dikhaye.</li>
+      </ul>
+      <b>3. Types of Nipple Discharge aur Matalab</b>
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-sm border border-pink-200 mb-2">
+          <thead>
+            <tr className="bg-pink-50">
+              <th className="border px-2 py-1">Discharge Ka Rang</th>
+              <th className="border px-2 py-1">Common Wajah</th>
+              <th className="border px-2 py-1">Cancer Risk</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="border px-2 py-1">Bloody (laal/pink)</td>
+              <td className="border px-2 py-1">Intraductal papilloma, cancer</td>
+              <td className="border px-2 py-1">Kabhi-kabhi cancer</td>
+            </tr>
+            <tr>
+              <td className="border px-2 py-1">Clear (saaf/pani jaisa)</td>
+              <td className="border px-2 py-1">Blocked duct, kabhi cancer</td>
+              <td className="border px-2 py-1">Cancer ho sakta hai</td>
+            </tr>
+            <tr>
+              <td className="border px-2 py-1">Yellow/green</td>
+              <td className="border px-2 py-1">Infection, duct ectasia</td>
+              <td className="border px-2 py-1">Zyada tar benign</td>
+            </tr>
+            <tr>
+              <td className="border px-2 py-1">Brown/bhura</td>
+              <td className="border px-2 py-1">Fibrocystic changes</td>
+              <td className="border px-2 py-1">Rarely cancer</td>
+            </tr>
+            <tr>
+              <td className="border px-2 py-1">Milky</td>
+              <td className="border px-2 py-1">Hormonal, breastfeeding</td>
+              <td className="border px-2 py-1">Na ke barabar cancer risk</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <span className="text-xs text-gray-500">*Note: Sirf bleeding ya discharge nahi, saath mein lump, dard, ya skin changes ho to risk aur badh jata hai.*</span>
+      <b>4. Related Symptoms</b>
+      <ul className="list-disc ml-6">
+        <li>Breast pain/swelling</li>
+        <li>Lump ya mass feel hona</li>
+        <li>Nipple mein kuch shape ka badlav (andar jana, hard hona)</li>
+        <li>Skin pe rash, redness ya ulcer</li>
+      </ul>
+      <b>5. Kab Doctor ko Dikhana Chahiye?</b>
+      <ul className="list-disc ml-6">
+        <li>Agar nipple se repeatedly ya bina dabaye khoon nikal raha ho</li>
+        <li>Discharge sirf ek breast se ho</li>
+        <li>Saath mein breast mein lump, dard ya skin changes ho</li>
+        <li>Post-menopausal ya >40 saal ki umar mein koi bhi aisa symptom dikhe</li>
+      </ul>
+      <b>6. Breast Cancer se Kaise Link Hota Hai?</b>
+      <ul className="list-disc ml-6">
+        <li>Nipple bleeding/discharge kabhi breast cancer ka pehla lakshan bhi ho sakta hai, khas kar agar koi lump nahi mil raha.</li>
+        <li>Paget’s disease of the breast naam ka cancer nipple aur areola mein changes kaaran hota hai, ismein discharge, bleeding, dryness ya itching ho sakti hai.</li>
+      </ul>
+      <b>7. Important Points</b>
+      <ul className="list-disc ml-6">
+        <li>Har nipple discharge cancer nahi hota, lekin kuch rang (bloody ya clear) zyada risky hain.</li>
+        <li>Early check-up se sahi diagnosis aur treatment ho sakta hai.</li>
+        <li>Agar koi doubt ho, breast specialist ya surgeon ko consult karein.</li>
+      </ul>
+      <div className="mt-2 text-pink-600 font-semibold italic">Aapki safety ke liye, breast changes ko ignore na karein. Jaldi pehchaan se treatment asaan rehta hai!</div>
+    </div>
+  )
+};
+
+function InfoModal({ open, onClose, title, message, symptomOptions, onSymptomSelect, nippleStep = 0, setModal, nippleData = {} }) {
+  if (!open) return null;
+  // Step 1: Ask about bleeding
+  if (title === 'Nipple/Areola' && nippleStep === 1) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full relative">
+          <button onClick={onClose} className="absolute top-3 right-3 text-gray-400 hover:text-pink-500 text-xl font-bold">&times;</button>
+          <h3 className="text-2xl font-bold text-pink-600 mb-4">Nipple Discharge</h3>
+          <div className="mb-4 text-gray-700">Kya bleeding thi (Khoon aata tha)?</div>
+          <div className="flex gap-4 mb-6">
+            <button className="px-4 py-2 rounded-full bg-pink-100 text-pink-700 font-semibold hover:bg-pink-200 transition" onClick={() => setModal(m => ({ ...m, nippleStep: 2, nippleData: { ...m.nippleData, bleeding: 'Yes' } }))}>Yes</button>
+            <button className="px-4 py-2 rounded-full bg-pink-100 text-pink-700 font-semibold hover:bg-pink-200 transition" onClick={() => setModal(m => ({ ...m, nippleStep: 2, nippleData: { ...m.nippleData, bleeding: 'No' } }))}>No</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  // Step 2: Ask about discharge type
+  if (title === 'Nipple/Areola' && nippleStep === 2) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full relative">
+          <button onClick={onClose} className="absolute top-3 right-3 text-gray-400 hover:text-pink-500 text-xl font-bold">&times;</button>
+          <h3 className="text-2xl font-bold text-pink-600 mb-4">Discharge ka Color/Type?</h3>
+          <div className="mb-4 text-gray-700">Discharge ka rang/type select karein:</div>
+          <div className="flex flex-wrap gap-2 mb-6">
+            {['Bloody', 'Clear', 'Yellow/Green', 'Brown', 'Milky', 'Other'].map(type => (
+              <button key={type} className="px-4 py-2 rounded-full bg-pink-100 text-pink-700 font-semibold hover:bg-pink-200 transition" onClick={() => setModal(m => ({ ...m, nippleStep: 3, nippleData: { ...m.nippleData, type } }))}>{type}</button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+  // Step 3: Show info
+  if (title === 'Nipple/Areola' && nippleStep === 3) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl w-full relative max-h-[90vh] overflow-y-auto">
+          <button onClick={onClose} className="absolute top-3 right-3 text-gray-400 hover:text-pink-500 text-xl font-bold">&times;</button>
+          <h3 className="text-2xl font-bold text-pink-600 mb-4">Nipple Bleeding/Discharge Details</h3>
+          <div className="mb-2 text-gray-700">Aapne select kiya: <b>{nippleData.bleeding}</b> bleeding, <b>{nippleData.type}</b> discharge.</div>
+          {NIPPLE_INFO.content}
+        </div>
+      </div>
+    );
+  }
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -170,7 +303,7 @@ function BreastModelInner({ onRegionClick }) {
       onRegionClick('Lower Outer Quadrant');
     } else if (point.y <= 0.3 && point.x >= 0) {
       onRegionClick('Lower Inner Quadrant');
-    } else if (Math.abs(point.x) < 0.15 && Math.abs(point.y) < 0.15) {
+    } else if (Math.abs(point.x) < 0.25 && Math.abs(point.y) < 0.25) {
       onRegionClick('Nipple/Areola');
     } else if (point.x < -0.5 && point.y > 0.5) {
       onRegionClick('Axilla (Armpit)');
@@ -191,7 +324,7 @@ function BreastModelInner({ onRegionClick }) {
 }
 
 export function BreastModel() {
-  const [modal, setModal] = useState({ open: false, title: '', message: '', symptomOptions: null });
+  const [modal, setModal] = useState({ open: false, title: '', message: '', symptomOptions: null, nippleStep: 0, nippleData: {} });
 
   // Step 1: User clicks a region
   const handleRegionClick = (region) => {
@@ -225,6 +358,11 @@ export function BreastModel() {
 
   // Step 2: User selects a symptom
   const handleSymptomSelect = (opt) => {
+    // Nipple/Areola special logic
+    if (modal.title === 'Nipple/Areola' && opt.key === 'discharge') {
+      setModal(modal => ({ ...modal, nippleStep: 1, symptomOptions: null, message: '' }));
+      return;
+    }
     setModal(modal => ({
       ...modal,
       message: opt.info,
@@ -242,11 +380,14 @@ export function BreastModel() {
       </Canvas>
       <InfoModal
         open={modal.open}
-        onClose={() => setModal({ ...modal, open: false })}
+        onClose={() => setModal({ ...modal, open: false, nippleStep: 0, nippleData: {} })}
         title={modal.title}
         message={modal.message}
         symptomOptions={modal.symptomOptions}
         onSymptomSelect={handleSymptomSelect}
+        nippleStep={modal.nippleStep}
+        setModal={setModal}
+        nippleData={modal.nippleData}
       />
     </>
   );
